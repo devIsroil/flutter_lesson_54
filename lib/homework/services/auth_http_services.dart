@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AuthHttpService {
+class AuthHttpServices {
   final String _apiKey = "AIzaSyC0ZH3nP2gomgZ9XOK4M2_udGOaotG10ss";
 
   Future<void> _authenticate(
@@ -35,7 +35,7 @@ class AuthHttpService {
       await sharedPreferences.setString("token", data['idToken']);
       await sharedPreferences.setString("userId", data['localId']);
       DateTime expiryDate = DateTime.now().add(
-        const Duration(seconds: 30),
+        Duration(seconds: int.parse(data['expiresIn'])),
       );
       await sharedPreferences.setString("expiryDate", expiryDate.toString());
     } catch (e) {
@@ -51,6 +51,15 @@ class AuthHttpService {
     await _authenticate(email, password, "signInWithPassword");
   }
 
+  Future<void> resetPassword() async {
+    Uri url = Uri.parse(
+        'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=$_apiKey');
+    final http.Response response = await http.post(url, body: {
+      'requestType': "PASSWORD_RESET",
+      'email': 'isroilkhasanov0727@gmail.com'
+    });
+  }
+
   Future<bool> checkAuth() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? token = sharedPreferences.getString("token");
@@ -64,5 +73,10 @@ class AuthHttpService {
 
     //? check token expiration date
     return expiryDate.isAfter(DateTime.now());
+  }
+
+  static void logout() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.clear();
   }
 }

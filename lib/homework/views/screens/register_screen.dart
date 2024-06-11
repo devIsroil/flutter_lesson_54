@@ -1,56 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 
 
-import '../../services/register_service.dart';
-import '../widgets/bottom_icons.dart';
-import 'home_page.dart';
+import '../../services/auth_http_services.dart';
+import 'home_screen.dart';
 import 'login_screen.dart';
 
-class RegistrationPage extends StatefulWidget {
+
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
   @override
-  _RegistrationPageState createState() => _RegistrationPageState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegistrationPageState extends State<RegistrationPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _authHttpServices = AuthHttpService();
-  final _emailController = TextEditingController();
+class _RegisterScreenState extends State<RegisterScreen> {
+  final formKey = GlobalKey<FormState>();
+  final _authHttpServices = AuthHttpServices();
   final _passwordController = TextEditingController();
-  final _password2Controller = TextEditingController();
+  final _passwordConfirmController = TextEditingController();
 
-  String? email, password, password2;
+  String? email, password, passwordConfirm;
   bool isLoading = false;
-  bool obscureTextChange = true;
-  bool obscureTextChange2 = true;
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    }
-    final emailRegExp = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegExp.hasMatch(value)) {
-      return 'Please enter a valid email address';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your password';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
-    }
-    if (_passwordController.text != _password2Controller.text) {
-      return "Passwords are not the same";
-    }
-    return null;
-  }
 
   void submit() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
 
       //? Register
       setState(() {
@@ -63,7 +37,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           context,
           MaterialPageRoute(
             builder: (ctx) {
-              return const HomePage();
+              return const HomeScreen();
             },
           ),
         );
@@ -89,166 +63,109 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
-  void _changeObscureText() {
-    setState(() {
-      obscureTextChange = !obscureTextChange;
-    });
-  }
-
-  void _changeObscureText2() {
-    setState(() {
-      obscureTextChange2 = !obscureTextChange2;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF5F5F5),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Create Account",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Color(0XFF1F41BB),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 26),
-                  ),
-                  const Text(
-                    "Create an account so you can explore all the existing jobs",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(
-                    height: 65,
-                  ),
-                  TextFormField(
-                    controller: _emailController,
-                    validator: _validateEmail,
-                    onSaved: (value) => email = value,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: const Color(0XFFF1F4FF),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                          const BorderSide(color: Color(0xff1F41BB))),
-                      hintText: "Email",
-                      hintStyle: TextStyle(
-                        color: Colors.grey.shade900,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: obscureTextChange,
-                    onSaved: (value) => password = value,
-                    validator: _validatePassword,
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                        onPressed: _changeObscureText,
-                        icon: obscureTextChange
-                            ? const Icon(CupertinoIcons.eye_slash)
-                            : const Icon(CupertinoIcons.eye),
-                      ),
-                      filled: true,
-                      fillColor: const Color(0XFFF1F4FF),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                          const BorderSide(color: Color(0xff1F41BB))),
-                      hintText: "Password",
-                      hintStyle: TextStyle(
-                        color: Colors.grey.shade900,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    controller: _password2Controller,
-                    onSaved: (value) => password2 = value,
-                    obscureText: obscureTextChange2,
-                    validator: _validatePassword,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: const Color(0XFFF1F4FF),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                          const BorderSide(color: Color(0xff1F41BB))),
-                      hintText: "Password",
-                      hintStyle: TextStyle(
-                        color: Colors.grey.shade900,
-                      ),
-                      suffixIcon: IconButton(
-                        onPressed: _changeObscureText2,
-                        icon: obscureTextChange2
-                            ? const Icon(CupertinoIcons.eye_slash)
-                            : const Icon(CupertinoIcons.eye),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  InkWell(
-                    onTap: submit,
-                    child: Container(
-                      height: 60,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: const Color(0xff1F41BB)),
-                      child: const Center(
-                        child: Text(
-                          "Sign up",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => LoginPage()));
-                    },
-                    child: const Text(
-                      "Already have an account",
-                      style: TextStyle(
-                          color: Color(0XFF494949),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  const BottomIcons()
-                ],
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text("Register"),
+      ),
+      body: Form(
+        key: formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // const FlutterLogo(
+              //   size: 90,
+              // ),
+              const SizedBox(height: 30),
+              TextFormField(
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Email",
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Please, enter your email";
+                  }
+
+                  return null;
+                },
+                onSaved: (newValue) {
+                  //? save email
+                  email = newValue;
+                },
               ),
-            ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Password",
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Please, enter your password";
+                  }
+
+                  return null;
+                },
+                onSaved: (newValue) {
+                  //? save password
+                  password = newValue;
+                },
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _passwordConfirmController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Password",
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Please, enter your password for accept";
+                  }
+
+                  if (_passwordController.text !=
+                      _passwordConfirmController.text) {
+                    return "Passwords do not match";
+                  }
+
+                  return null;
+                },
+                onSaved: (newValue) {
+                  //? save password confirm
+                  passwordConfirm = newValue;
+                },
+              ),
+              const SizedBox(height: 20),
+              isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : FilledButton(
+                onPressed: submit,
+                child: const Text("Sign up"),
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (ctx) {
+                        return const LoginScreen();
+                      },
+                    ),
+                  );
+                },
+                child: const Text("Log in"),
+              ),
+              Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom))
+            ],
           ),
         ),
       ),

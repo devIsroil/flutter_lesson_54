@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 extension ContextExtension on BuildContext {
   double screenWidth() {
@@ -16,12 +15,12 @@ extension ContextExtension1 on BuildContext {
 extension SizedBoxExtension on int {
   Widget height() {
     return SizedBox(
-      height: toDouble().h,
+      height: toDouble(),
     );
   }
   Widget width() {
     return SizedBox(
-      width: toDouble().w,
+      width: toDouble(),
     );
   }
 }
